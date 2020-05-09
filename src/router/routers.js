@@ -57,48 +57,6 @@ export const constantRouterMap = [
         meta: { title: '个人中心' }
       }
     ]
-  },
-  {
-    path: '/assetImport',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'assetUpload',
-        component: () => import('@/views/poc/assetImport/assetUpload'),
-        name: '客户资产导入',
-        meta: { title: '客户资产导入' }
-      }
-    ]
-  },
-  {
-    path: '/taskDetail',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'shipmentsUpload',
-        component: () => import('@/views/hw/taskDetail/shipmentsUpload'),
-        name: '发运资产导入',
-        meta: { title: '发运资产导入' }
-      }
-    ]
-  },
-  {
-    path: '/taskImport',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'taskUpload',
-        component: () => import('@/views/poc/taskImport/taskUpload'),
-        name: '任务导入',
-        meta: { title: '任务导入' }
-      }
-    ]
   }
 ]
 

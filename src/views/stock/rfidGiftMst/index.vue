@@ -111,7 +111,7 @@
           </template>         
         </el-table-column>
         <el-table-column v-if="columns.visible('registerDat')" prop="registerDat" label="登记时间" />
-        <el-table-column v-permission="['admin','GiftMst:edit','GiftMst:del']" label="操作" width="150px" align="center">
+        <el-table-column v-permission="['admin','rfidGiftMst:edit','rfidGiftMst:del']" label="操作" width="150px" align="center">
           <template slot-scope="scope">
             <udOperation
               :data="scope.row"
@@ -147,9 +147,9 @@ export default {
   data() {
     return {
       permission: {
-        add: ['admin', 'GiftMst:add'],
-        edit: ['admin', 'GiftMst:edit'],
-        del: ['admin', 'GiftMst:del']
+        add: ['admin', 'rfidGiftMst:add'],
+        edit: ['admin', 'rfidGiftMst:edit'],
+        del: ['admin', 'rfidGiftMst:del']
       },
       rules: {
         giftName: [
@@ -203,8 +203,8 @@ export default {
       })
     },
     handleAvatarSuccess(res, file) {
-      this.imageUrl = file.response.domain + '/' + file.response.name
-      this.form.imgUrl = file.response.domain + '/' + file.response.name
+      this.imageUrl = process.env.VUE_APP_BASE_API + file.response
+      this.from.imgUrl = file.response
     },
     beforeAvatarUpload(file) {
       console.log(file.type)
