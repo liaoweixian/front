@@ -41,8 +41,8 @@
             type="success"
             icon="el-icon-video-play"
             :disabled="crud.selections.length === 0"
-            @click="discontinue"
-          >停用</el-button>
+            @click="rowCopy"
+          >复制</el-button>
         </template>
       </crudOperation>
       <!--表单组件-->
@@ -199,6 +199,20 @@ export default {
         data: sel
       }).then(function(result) {
         _this.$message('操作成功！')
+        _this.crud.toQuery()
+      })
+    },
+    rowCopy() {
+      let _this = this
+      if (this.crud.selections.length > 1) {
+        this.$message('请选择单个礼品进行操作！')
+        return false
+      }
+      const element = this.crud.selections[0]
+      request({
+        url: 'api/rfidGiftMst/copy?id=' + element.id,
+        method: 'get'
+      }).then(function(result) {
         _this.crud.toQuery()
       })
     },

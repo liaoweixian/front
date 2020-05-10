@@ -11,7 +11,7 @@
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
-      <crudOperation :permission="permission" />
+      <crudOperation :permission="toor" />
       <!--表单组件-->
       <el-dialog :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="500px">
         <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
@@ -20,9 +20,9 @@
               <el-option v-for="item in storehouse" :key="item.locationCod" :value="item.locationCod" :label="item.locationName" />
             </el-select>
           </el-form-item>
-          <el-form-item label="库存数量">
+        <!--   <el-form-item label="库存数量">
             <el-input v-model="form.inventoryCnt" style="width: 370px;" />
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button type="text" @click="crud.cancelCU">取消</el-button>
@@ -37,7 +37,7 @@
         <el-table-column v-if="columns.visible('inventoryCnt')" prop="inventoryCnt" label="库存数量" />
         <el-table-column v-if="columns.visible('lastChangeDat')" prop="lastChangeDat" label="最后变更时间" />
         <el-table-column v-if="columns.visible('lastChangeUserName')" prop="lastChangeUserName" label="最后变更用户" />
-        <el-table-column v-permission="['admin','rfidInvMst:edit','rfidInvMst:del']" label="操作" width="150px" align="center">
+        <el-table-column v-permission="['admin','rfidInvMst:edit']" label="操作" width="150px" align="center">
           <template slot-scope="scope">
             <udOperation
               :data="scope.row"
@@ -71,9 +71,14 @@ export default {
   data() {
     return {
       permission: {
-        add: ['admin', 'rfidInvMst:add'],
+        add: ['admin'],
         edit: ['admin', 'rfidInvMst:edit'],
-        del: ['admin', 'rfidInvMst:del']
+        del: ['admin']
+      },
+      toor: {
+        add: ['admin'],
+        edit: ['admin'],
+        del: ['admin']
       },
       rules: {
       },

@@ -8,7 +8,7 @@
         </div>
       </el-row>
       <el-row class="f-f1 ">
-        <el-col class="col-title f-ajc">仓库作业看板系统</el-col>
+        <el-col class="col-title f-ajc"></el-col>
       </el-row>
       <el-row>
         <!--  <div style="font-size: 24px;font-weight: bold;">
@@ -24,18 +24,11 @@
             <div class="echarts-content">
               <div class="warning-box-1">
                 <div class="f-ajc">
-                  <div class=" div-table-title">客户姓名</div>
-                  <div class=" div-table-title">礼品编号</div>
-                  <div class=" div-table-title">状态</div>
-                  <div class=" div-table-title">推荐货位</div>
                 </div>
               </div>
-              <div class="warning-box" :class="{warning_animate: orderAnimate}">
-                <div v-for="(item, index) in order" :key="index" class=" f-ajc">
-                  <div class="div-table-td">{{ item.clientName }}</div>
-                  <div class="div-table-td">{{ item.giftCod }}</div>
-                  <div class="div-table-td">{{ dict.label.order_status[item.status] }} </div>
-                  <div class="div-table-td">{{ item.toLocationCod }}</div>
+              <div class="warning-box" :class="{warning_animate: memberAnimate}">
+                <div v-for="(item, index) in member" :key="index" class=" f-ajc">
+                  <div class="div-table-td">欢迎{{ item.clientName }}到此处参观</div>
                 </div>
               </div>
             </div>
@@ -58,15 +51,10 @@ export default {
   },
   data() {
     return {
-      animate: false, // 列表滚动动画
-      orderAnimate: false,
-     
       timeFinishId: null, // 订单完成定时器id
-      // 已完成订单数据
-      finishOrder: [],
-      order: [],
-      // 未完成订单数据
-      runningOrder: [], 
+      // 客户信息
+      member: [],
+      memberAnimate: false,
       // 进度条
       percentage: 10,
       colors: [
@@ -75,15 +63,7 @@ export default {
         { color: '#5cb87a', percentage: 60 },
         { color: '#1989fa', percentage: 80 },
         { color: '#6f7ad3', percentage: 100 }
-      ],
-      helperDevices: [],
-      tagDevices: [],
-      doors: [],
-      user: {},
-      receiver: {},
-      title: '',
-      doorNumber: 1
-      
+      ]
     }
   },
   computed: {
@@ -92,56 +72,37 @@ export default {
     ])
   },
   watch: {
+    // 数据监听
     'websocketData.MEMBER'(val) {
-      console.log('-----------------------------监听数据')
-      console.log(val)
+      this.member.push(val)
     }
   },
   created() {
-    this.getOrder()
-    this.timeOrder()
+    
   },
   mounted() {
-    // this.showOrder()
   },
   beforeDestroy() {
     clearTimeout(this.timeFinishId)
   },
   methods: {
-    showOrder() {
-      console.log(this.order)
-      if (this.order.length <= 7) {
+    showMember() {
+      console.log(this.member)
+      if (this.member.length <= 1) {
         return
       }
       this.timeFinishId = setTimeout(() => {
-        this.orderAnimate = true
-
+        this.memberAnimate = true
         setTimeout(() => { // 延迟0.5秒是为动画腾出时间
-          const completeList = this.order
+          const completeList = this.member
           completeList.push(completeList[0])
+          // 删除第一个元素
           completeList.shift()
           this.order = completeList
-          this.orderAnimate = false
+          this.memberAnimate = false
         }, 500)
-        this.showOrder()
+        this.showMember()
       }, 2000)
-    },
-    getOrder() {
-      const _this = this
-      request({
-        url: 'api/rfidGiftTrn',
-        method: 'get',
-        params: { page: 0, size: 1000 }
-      }).then((result) => {
-        _this.order = result.content
-        clearTimeout(_this.timeFinishId)
-        this.showOrder()
-      })
-    },
-    timeOrder() {
-      setTimeout(() => {
-        this.getOrder()
-      }, 10000)
     }
   }
 }

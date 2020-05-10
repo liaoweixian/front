@@ -4,10 +4,27 @@
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
-        <el-input v-model="query.value" clearable placeholder="输入搜索内容" style="width: 200px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
-        <el-select v-model="query.type" clearable placeholder="类型" class="filter-item" style="width: 130px">
-          <el-option v-for="item in queryTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-        </el-select>
+        <el-input
+          v-model="query.clientName"
+          clearable
+          size="small"
+          placeholder="输入客户姓名搜索"
+          style="width: 200px;"
+          class="filter-item"
+          @keyup.enter.native="crud.toQuery"
+        />
+        <el-input
+          v-model="query.giftCod"
+          clearable
+          size="small"
+          placeholder="输入礼品编号搜索"
+          style="width: 200px;"
+          class="filter-item"
+          @keyup.enter.native="crud.toQuery"
+        />
+        <el-select v-model="query.status" clearable placeholder="状态" class="filter-item" style="width: 130px">
+          <el-option v-for="item in dict.order_status" :key="item.id" :label="item.label" :value="item.value" />
+        </el-select> 
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
@@ -77,7 +94,7 @@
           </el-main>
           <el-aside width="200px" style="align-items:center;" class="cll">
             <div style="margin:0 auto; display:flex;align-items:center; justify-content:center;height:100px;">
-              <img :src="form.imgUrl" style="width:auto; height:auto;">
+              <img :src="form.imgUrl" style="width: 111px;height: 171px;">
             </div>
           </el-aside>
         </el-container>
@@ -215,7 +232,10 @@ export default {
         method: 'get',
         params: { page: 0, size: 1000 }
       }).then((result) => {
-        _this.showGift = result.content
+        let giftList = result.content
+        const res = new Map()
+        // eslint-disable-next-line eqeqeq
+        _this.showGift = giftList.filter((a) => (!res.has(a.giftModel) && res.set(a.giftModel, 1)) && a.isBind != 1)
       })
     },
     getMember() {

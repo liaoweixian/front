@@ -39,7 +39,8 @@ export default {
       device: state => state.app.device,
       showSettings: state => state.settings.showSettings,
       needTagsView: state => state.settings.tagsView,
-      fixedHeader: state => state.settings.fixedHeader
+      fixedHeader: state => state.settings.fixedHeader,
+      user: state => state.user.user
     }),
     classObj() {
       return {
@@ -51,86 +52,80 @@ export default {
       }
     }
   },
-  mounted(){
-
+  created() {
+   
+  },
+  mounted() {
     this.connection()
   },
-  destroyed(){
+  destroyed() {
     this.disconnect()
   },
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
     },
-     connection () {
-        const URL = '47.98.228.109'
-         var options = {
-                     // 如果连接在此秒数内未成功，则视为已失败
-                    // connectTimeout: 10,
-                     // 如果存在且为true，则使用SSL Websocket连接
-                    // useSSL: useTLS,
-                     // 如果此秒数内没有活动，服务器将断开此客户端的连接
-                    keepalive: 60,
-                    //session 标志位，当 clean session = false 时，
-                    //client 失去连接时， broker 会一直保留消息直到 client 重新连接。
-                    // 而 clean session = true 时，broker 会清除所有的消息当这个 client 失去连接。
-                    // clean: cleansession,
-                    username:'xs-front',
-                    password:'',
-                    clientId:'xs-'+new Date()
-         }
-        const client = mqtt.connect(`mqtt://${URL}:8083/mqtt`)
-        // 连接
-        client.on('connect', () => {
-          console.log('连接' + new Date())
-          setTimeout(() => {
-             this.doors=this.$store.getters.doors
-                 console.log('topic' +JSON.stringify(this.doors))
-          // 订阅端口
-         this.doors.forEach(item => {
-           //订阅数据RFID 以库门为单位
-            client.subscribe('/sense/server/rs01/'+item.id,{ qos: 1 }, function (err) {
-              if (!err) {
-                console.error('订阅成功: ' + "/sense/server/rs01/"+item.id)
-               
-              }else{
-                 console.error('订阅失败: ' + err)
-              }
-            }),
-            //订阅警告数据，以库门为单位
-            client.subscribe('/sense/server/rs01/warning/'+item.id,{ qos: 1 }, function (err) {
-              if (!err) {
-                console.error('订阅成功: ' + "/sense/server/rs01/warning/"+item.id)
-               
-              }else{
-                 console.error('订阅失败: ' + err)
-              }
-            })
-          })
-          }, 1500);
-      
-        })
-       
-        // 获取到消息
-        client.on('message', (topic, message) => {
-          // message is Buffer
-          // console.log(topic)
-          // console.log(message.toString())
-          const data = JSON.parse(message.toString())
-         
-          this.$store.dispatch('SendWebsocketData', data)
-        })
-        // 断开自动重连
-        client.on('close', () => {
-          console.log('close重新连接' + new Date())
-        })
-      },
-      disconnect() {
-        if (this.stompClient != null) {
-          this.stompClient.disconnect();
-          console.log("Disconnected");
-        }
+    connection() {
+      const URL = '47.98.228.109'
+      var options = {
+        // 如果连接在此秒数内未成功，则视为已失败
+        // connectTimeout: 10,
+        // 如果存在且为true，则使用SSL Websocket连接
+        // useSSL: useTLS,
+        // 如果此秒数内没有活动，服务器将断开此客户端的连接
+        keepalive: 60,
+        // session 标志位，当 clean session = false 时，
+        // client 失去连接时， broker 会一直保留消息直到 client 重新连接。
+        // 而 clean session = true 时，broker 会清除所有的消息当这个 client 失去连接。
+        // clean: cleansession,
+        username: 'xs-front',
+        password: '',
+        clientId: 'xs-' + new Date()
       }
+      const client = mqtt.connect(`mqtt://${URL}:8083/mqtt`)
+      let _this = this
+      // 连接
+      client.on('connect', () => {
+        console.log('连接' + new Date())
+        setTimeout(() => {
+          // 订阅端口
+          // 客户消息订阅
+          client.subscribe('/member/info/' + _this.user.id, { qos: 1 }, function(err) {
+            if (!err) {
+              console.error('订阅成功: ' + '/member/info/' + _this.user.id)
+            } else {
+              console.error('订阅失败: ' + err)
+            }
+          })
+        }, 1500)
+      })
+      // 获取到消息
+      client.on('message', (topic, message) => {
+        // message is Buffer
+        /* console.log('======================================')
+        console.log(topic)
+        console.log(message.toString()) */
+        // 作为客户下单完成 提是仓库管理员 暂时没想好加哪里
+        /* this.$notify({
+          title: '提示',
+          message: '你有一条订单待处理，请到订单首页查看',
+          duration: 0
+        }) */
+        const data = JSON.parse(message.toString())
+        
+        this.$store.dispatch('SendWebsocketData', data)
+      })
+      // 断开自动重连
+      client.on('close', () => {
+        console.log('close重新连接' + new Date())
+      })
+    },
+    disconnect() {
+      if (this.stompClient != null) {
+        this.stompClient.disconnect()
+        console.log('Disconnected')
+      }
+    }
   }
 }
 </script>

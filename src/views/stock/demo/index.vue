@@ -4,21 +4,19 @@
     <el-header>
       <el-row>
         <div>
-          <img src="/huawei_logo.png">
+          <img src="/huawei_logo.png" style="width: 119px; height: 49px;">
         </div>
-        <!-- <el-button  type="info" @click="importExcel">Excel导入</el-button> -->
       </el-row>
       <el-row class="f-f1 ">
         <el-col class="col-title f-ajc">仓库作业看板系统</el-col>
       </el-row>
       <el-row>
-        <div style="font-size: 24px;font-weight: bold;">
+        <!--  <div style="font-size: 24px;font-weight: bold;">
           <el-button type="primary"> 配置 </el-button>  
-        </div>
+        </div> -->
       </el-row>
     </el-header>
     <el-main>
-      <!-- 下面部分 -->
       <!-- 列表 -->
       <el-row>
         <el-col>
@@ -26,88 +24,46 @@
             <div class="echarts-content">
               <div class="warning-box-1">
                 <div class="f-ajc">
-                  <div class=" div-table-title">已完成订单</div>
-                  <div class=" div-table-title">已完成订单</div>
-                  <div class=" div-table-title">已完成订单</div>
+                  <div class=" div-table-title">客户姓名</div>
+                  <div class=" div-table-title">礼品编号</div>
+                  <div class=" div-table-title">状态</div>
+                  <div class=" div-table-title">推荐货位</div>
                 </div>
               </div>
               <div class="warning-box" :class="{warning_animate: orderAnimate}">
                 <div v-for="(item, index) in order" :key="index" class=" f-ajc">
-                  <div class="div-table-td">订单: {{ item.orderKey }} 已完成装车</div>
-                  <div class="div-table-td">订单: {{ item.orderKey }} 已完成装车</div>
-                  <div class="div-table-td">订单: {{ item.orderKey }} 已完成装车</div>
+                  <div class="div-table-td">{{ item.clientName }}</div>
+                  <div class="div-table-td">{{ item.giftCod }}</div>
+                  <div class="div-table-td">{{ dict.label.order_status[item.status] }} </div>
+                  <div class="div-table-td">{{ item.toLocationCod }}</div>
                 </div>
               </div>
             </div>
           </div>
         </el-col>
       </el-row>
-      <!-- <el-row>
-        <el-col span="12">
-          <div class="echarts-box">
-            <table>
-              <tr>
-                <th>ceshi</th>
-                <th>ceshi</th>
-              </tr>
-              <div class="echarts-content">
-                <div class="warning-box" :class="{warning_animate: orderAnimate}">
-                  <tr v-for="(item, index) in order" :key="index" >
-                    <td>{{ item.orderKey }}</td>
-                    <td>{{ item.orderKey }}</td>
-                  </tr>
-                </div>
-              </div>
-            </table>
-          </div>
-        </el-col>
-      </el-row>   -->
     </el-main>
   </el-container>
 </template>
 
 <script>
-import store from '@/store'
-import { mapGetters } from 'vuex'
+import request from '@/utils/request'
 
 export default {
   name: 'Dashboard',
+  dicts: ['order_status'],
   components: {
   
   },
   data() {
     return {
-      tagList: [], // 未读到的发运标签
-      dialogVisible: false, // dialog显示控制
       animate: false, // 列表滚动动画
       orderAnimate: false,
-      animateRunning: false, // 列表滚动动画
+     
       timeFinishId: null, // 订单完成定时器id
-      timeRunningId: null, // 订单未完成定时器id
-
-      // 车辆靠站信息
-      carPortInData: {},
       // 已完成订单数据
       finishOrder: [],
-      order: [
-        { orderKey: '123' },
-        { orderKey: '1234' },
-        { orderKey: '1235' },
-        { orderKey: '1236' },
-        { orderKey: '1243' },
-        { orderKey: '1244' },
-        { orderKey: '1243' },
-        { orderKey: '1256' },
-        { orderKey: '1266' },
-        { orderKey: '1287' },
-        { orderKey: '12920' },
-        { orderKey: '12930' },
-        { orderKey: '12940' },
-        { orderKey: '12950' },
-        { orderKey: '12960' },
-        { orderKey: '12920' },
-        { orderKey: '12910' }
-      ],
+      order: [],
       // 未完成订单数据
       runningOrder: [], 
       // 进度条
@@ -124,7 +80,7 @@ export default {
       doors: [],
       user: {},
       receiver: {},
-      title: 'SENSE-eR220 RFID自动识别系统 V1.0',
+      title: '',
       doorNumber: 1
       
     }
@@ -136,16 +92,16 @@ export default {
     
   },
   created() {
+    this.getOrder()
   },
   mounted() {
-    this.getOrder()
+    
   },
   beforeDestroy() {
     clearTimeout(this.timeFinishId)
-    clearTimeout(this.timeRunningId)
   },
   methods: {
-    getOrder() {
+    showOrder() {
       console.log(this.order)
       if (this.order.length <= 2) {
         return
@@ -160,8 +116,20 @@ export default {
           this.order = completeList
           this.orderAnimate = false
         }, 500)
-        this.getOrder()
+        this.showOrder()
       }, 2000)
+    },
+    getOrder() {
+      const _this = this
+      request({
+        url: 'api/rfidGiftTrn',
+        method: 'get',
+        params: { page: 0, size: 1000 }
+      }).then((result) => {
+        _this.order = result.content
+        clearTimeout(_this.timeFinishId)
+        this.showOrder()
+      })
     }
   }
 }
