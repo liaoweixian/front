@@ -136,6 +136,7 @@ export default {
         _this.order = result.content
         clearTimeout(_this.timeFinishId)
         this.showOrder()
+        this.timeOrder()
       })
     },
     timeOrder() {
