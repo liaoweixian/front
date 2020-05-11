@@ -57,8 +57,10 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="8">
-                    <el-form-item label="推荐货架" prop="toLocationCod">
-                      <el-input v-model="form.toLocationCod" style="width: 150px;" />
+                    <el-form-item label="推荐货架">
+                      <el-select v-model="form.toLocationCod" placeholder="请选择" style="width: 150px;">
+                        <el-option v-for="item in storehouse" :key="item.locationCod" :value="item.locationCod" :label="item.locationName" />
+                      </el-select>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -108,7 +110,7 @@
         <el-table-column type="selection" width="55" />
         <el-table-column v-if="columns.visible('clientName')" prop="clientName" label="客户名称" width="80" />
         <el-table-column v-if="columns.visible('giftCod')" prop="giftCod" label="礼品编号" width="200" />
-        <el-table-column v-if="columns.visible('toLocationCod')" prop="toLocationCod" label="库位编码" />
+        <!--  <el-table-column v-if="columns.visible('toLocationCod')" prop="toLocationCod" label="库位编码" /> -->
         <el-table-column v-if="columns.visible('giftCnt')" prop="giftCnt" label="数量" />
         <el-table-column v-if="columns.visible('status')" prop="status" label="状态">
           <template slot-scope="scope">
@@ -191,12 +193,21 @@ export default {
       showGift: [],
       showMember: [],
       imageWidth: '',
-      imageHeight: ''
+      imageHeight: '',
+      storehouse: []
     }
   },
   created() {
     this.getGiftAll()
     this.getMember()
+    // 初始化库位
+    request({
+      url: 'api/rfidLocMst/all',
+      method: 'get',
+      params: { isDelete: 0 }
+    }).then((result) => {
+      this.storehouse = result
+    })
   },
   beforeDestroy: function() {
     // 目标页面销毁，清除查询条件

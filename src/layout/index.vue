@@ -53,7 +53,7 @@ export default {
     }
   },
   created() {
-   
+    
   },
   mounted() {
     this.connection()
@@ -97,6 +97,16 @@ export default {
               console.error('订阅失败: ' + err)
             }
           })
+          // 只有仓库管理员才订阅
+          if (_this.user.username.startsWith('cg')) {
+            client.subscribe('/order/prompt/', { qos: 1 }, function(err) {
+              if (!err) {
+                console.error('订阅成功: ' + '/order/prompt/')
+              } else {
+                console.error('订阅失败: ' + err)
+              }
+            })
+          }
         }, 1500)
       })
       // 获取到消息
@@ -105,15 +115,17 @@ export default {
         /* console.log('======================================')
         console.log(topic)
         console.log(message.toString()) */
-        // 作为客户下单完成 提是仓库管理员 暂时没想好加哪里
-        /* this.$notify({
-          title: '提示',
-          message: '你有一条订单待处理，请到订单首页查看',
-          duration: 0
-        }) */
-        const data = JSON.parse(message.toString())
-        
-        this.$store.dispatch('SendWebsocketData', data)
+
+        if (topic === '/order/prompt/') {
+          this.$notify({
+            title: '提示',
+            message: '你有一条订单待处理，请到订单列表查看',
+            duration: 0
+          })
+        } else {
+          const data = JSON.parse(message.toString())
+          this.$store.dispatch('SendWebsocketData', data)
+        }
       })
       // 断开自动重连
       client.on('close', () => {
