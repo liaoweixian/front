@@ -94,7 +94,7 @@
           </el-main>
           <el-aside width="200px" style="align-items:center;" class="cll">
             <div style="margin:0 auto; display:flex;align-items:center; justify-content:center;height:100px;">
-              <img :src="form.imgUrl" style="width: 111px;height: 171px;">
+              <img v-if="form.imgUrl" :src="getImage(form.imgUrl)" style="width:111px;height:171px">
             </div>
           </el-aside>
         </el-container>
@@ -189,7 +189,9 @@ export default {
         { key: 'status', display_name: '状态' }
       ],
       showGift: [],
-      showMember: []
+      showMember: [],
+      imageWidth: '',
+      imageHeight: ''
     }
   },
   created() {
@@ -247,6 +249,11 @@ export default {
       }).then((result) => {
         _this.showMember = result.content
       })
+    },
+    getImage(url) {
+      this.imageWidth = '111px'
+      this.imageWidth = '171px'
+      return process.env.VUE_APP_BASE_API + url
     }
   }
 }

@@ -37,7 +37,7 @@
       <crudOperation :permission="permission" />
       <!--表单组件-->
       <el-dialog :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="500px">
-        <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
+        <el-form ref="form" :model="form" :rules="rules" size="small" label-width="90px">
           <el-form-item label="客户编号" prop="clientCod">
             <el-input v-model="form.clientCod" style="width: 370px;" />
           </el-form-item>

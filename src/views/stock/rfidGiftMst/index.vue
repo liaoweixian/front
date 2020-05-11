@@ -79,7 +79,7 @@
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload"
             >
-              <img v-if="imageUrl" :src="imageUrl" class="avatar">
+              <img v-if="form.imgUrl" :src="getImage(form.imgUrl)" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon" />
             </el-upload>
           </el-form-item>
@@ -98,16 +98,16 @@
         <el-table-column v-if="columns.visible('giftModel')" prop="giftModel" label="型号" width="100" />
         <el-table-column v-if="columns.visible('toLocationCod')" prop="toLocationCod" label="推荐货位" />
         <el-table-column v-if="columns.visible('inventoryCnt')" prop="inventoryCnt" label="数量" />
-        <el-table-column v-if="columns.visible('isUse')" prop="isUse" label="停用标志">
+        <!-- <el-table-column v-if="columns.visible('isUse')" prop="isUse" label="停用标志">
           <template slot-scope="scope">
             <div>{{ dict.label.is_discontinue[scope.row.isUse] }}</div>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column v-if="columns.visible('rfidCod')" prop="rfidCod" label="RFID编码" />
         <el-table-column prop="imgUrl" label="礼品图">
           <!-- 图片的显示 -->
           <template slot-scope="scope">            
-            <img :src="scope.row.imgUrl" min-width="70" height="70">
+            <img :src="getImage(scope.row.imgUrl)" min-width="70" height="70">
           </template>         
         </el-table-column>
         <el-table-column v-if="columns.visible('registerDat')" prop="registerDat" label="登记时间" />
@@ -138,7 +138,7 @@ import { getToken } from '@/utils/auth'
 
 // crud交由presenter持有
 const defaultCrud = CRUD({ title: '礼品管理', url: 'api/rfidGiftMst', sort: 'id,desc', crudMethod: { ...crudGiftMst }})
-const defaultForm = { id: null, giftCod: null, giftName: null, giftType: null, giftModel: null, toLocationCod: null, isUse: null, rfidCod: null, registerDat: null, visitSta: null, isDelete: null }
+const defaultForm = { id: null, giftCod: null, giftName: null, giftType: null, giftModel: null, toLocationCod: null, isUse: null, rfidCod: null, registerDat: null, visitSta: null, isDelete: null, imgUrl: null }
 export default {
   name: 'RfidGiftMst',
   dicts: ['is_discontinue', 'is_delete', 'visit_status'],
@@ -217,8 +217,8 @@ export default {
       })
     },
     handleAvatarSuccess(res, file) {
-      this.imageUrl = process.env.VUE_APP_BASE_API + file.response
-      this.from.imgUrl = file.response
+      // this.imageUrl = process.env.VUE_APP_BASE_API + file.response
+      this.form.imgUrl = file.response
     },
     beforeAvatarUpload(file) {
       console.log(file.type)
@@ -232,11 +232,14 @@ export default {
         this.$message.error('上传头像图片大小不能超过 2MB!')
       }
       return isJPG && isLt2M
+    },
+    getImage(url) {
+      return process.env.VUE_APP_BASE_API + url
     }
   }
 }
 
-</script>
+</script> 
 
 <style scoped>
 .avatar-uploader .el-upload {

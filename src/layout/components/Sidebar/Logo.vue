@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      title: '先施-仓库管理',
+      title: '先施-作业看板系统',
       logo: Logo
     }
   }
