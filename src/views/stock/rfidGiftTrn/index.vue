@@ -117,7 +117,7 @@
             {{ dict.label.order_status[scope.row.status] }}
           </template>
         </el-table-column>
-        <el-table-column v-if="columns.visible('toLocationCod')" prop="toLocationCod" label="推荐货位编号" />
+        <el-table-column v-if="columns.visible('locationName')" prop="locationName" label="推荐货位" />
         <!-- <el-table-column v-if="columns.visible('createTime')" prop="createTime" label="创建时间" /> -->
         <el-table-column v-if="columns.visible('createName')" prop="createName" label="创建人" />
         <!-- <el-table-column v-if="columns.visible('updateTime')" prop="updateTime" label="修改时间" width="150" /> -->
@@ -200,14 +200,7 @@ export default {
   created() {
     this.getGiftAll()
     this.getMember()
-    // 初始化库位
-    request({
-      url: 'api/rfidLocMst/all',
-      method: 'get',
-      params: { isDelete: 0 }
-    }).then((result) => {
-      this.storehouse = result
-    })
+    this.getArea()
   },
   beforeDestroy: function() {
     // 目标页面销毁，清除查询条件
@@ -220,7 +213,18 @@ export default {
       if (query.type && query.value) {
         this.crud.params[query.type] = query.value
       }
+      this.storehouse = this.storehouse.filter(t => t.toLocationCod != query.toLocationCod)
+    
       return true
+    },
+    getArea() {
+      request({
+        url: 'api/rfidLocMst/isNotBind',
+        method: 'get',
+        params: { isDelete: 0 }
+      }).then((result) => {
+        this.storehouse = result
+      })
     },
     giftModel(data) {
       this.getGift(this.form.giftModel)
